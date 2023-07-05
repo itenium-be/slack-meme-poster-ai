@@ -1,0 +1,10 @@
+version: '3'
+
+services:
+  cronjob:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./cronjob:/etc/cron.d/cronjob
+    restart: unless-stopped
