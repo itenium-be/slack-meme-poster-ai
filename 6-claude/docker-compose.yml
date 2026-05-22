@@ -1,0 +1,11 @@
+services:
+  slack-meme-poster:
+    build: .
+    container_name: slack-meme-poster
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/Brussels
+      - SLACK_BOT_TOKEN=${SLACK_BOT_TOKEN}
+      - SLACK_CHANNEL_ID=${SLACK_CHANNEL_ID}
+    volumes:
+      - ./memes:/memes
