@@ -1,0 +1,31 @@
+services:
+  poster:
+    build: ./poster
+    container_name: slack-meme-poster
+    restart: unless-stopped
+    environment:
+      TZ: ${TZ:-Europe/Brussels}
+      SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
+      PUBLIC_MEMES_URL: ${PUBLIC_MEMES_URL}
+      MEMES_DIR: /memes
+    volumes:
+      - ./memes:/memes
+    depends_on:
+      - nginx
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: slack-meme-nginx
+    restart: unless-stopped
+    ports:
+      # Bind only to localhost — put your reverse proxy in front of this.
+      # Change to "${NGINX_PORT:-8080}:80" if you're exposing directly.
+      - "127.0.0.1:${NGINX_PORT:-8080}:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./memes:/srv/memes:ro
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost/healthz"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
