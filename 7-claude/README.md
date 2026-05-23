@@ -46,7 +46,7 @@ docker compose run --rm poster python /app/post_meme.py --dry-run
 To actually fire a post right now (real Slack message, file moves):
 
 ```sh
-docker compose run --rm poster python /app/post_meme.py
+docker-compose run --rm poster python /app/post_meme.py
 ```
 
 Check that nginx is serving (locally, then through the public URL):

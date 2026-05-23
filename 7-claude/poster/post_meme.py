@@ -85,7 +85,12 @@ def _http_post(url: str, payload: dict[str, Any]) -> int:
     """Default HTTP poster. Module-level so tests can monkeypatch it."""
     import requests  # imported lazily so tests don't need the dep at import time
 
-    return requests.post(url, json=payload, timeout=10).status_code
+    try:
+        return requests.post(url, json=payload, timeout=10).status_code
+    except requests.exceptions.RequestException as e:
+        # Translate to a clean message instead of dumping a full traceback in
+        # cron.log when the webhook host is unreachable / DNS fails / times out.
+        raise RuntimeError(f"webhook unreachable: {e.__class__.__name__}") from e
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

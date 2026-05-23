@@ -1,6 +1,21 @@
 #!/bin/sh
 set -eu
 
+# Dispatch: when args are passed (e.g. `docker compose run poster python ...`),
+# treat it as a one-shot and exec straight through — skip the cron setup so
+# `python /app/post_meme.py` actually runs the script instead of starting a
+# daemon that waits for Friday 16:00.
+if [ "$#" -gt 0 ] && [ "$1" != "cron" ]; then
+    # Set TZ for the one-shot too, in case the script logs timestamps.
+    if [ -n "${TZ:-}" ] && [ -f "/usr/share/zoneinfo/$TZ" ]; then
+        cp "/usr/share/zoneinfo/$TZ" /etc/localtime
+        echo "$TZ" > /etc/timezone
+    fi
+    exec "$@"
+fi
+
+# --- cron mode (no args, or explicit "cron") ---
+
 # Cron's child shell inherits an empty environment. Dump the vars the script
 # actually needs to a file, then source it from the crontab line.
 {
