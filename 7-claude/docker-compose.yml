@@ -18,14 +18,15 @@ services:
     container_name: slack-meme-nginx
     restart: unless-stopped
     ports:
-      # Bind only to localhost — put your reverse proxy in front of this.
-      # Change to "${NGINX_PORT:-8080}:80" if you're exposing directly.
-      - "127.0.0.1:${NGINX_PORT:-8080}:80"
+      # Exposed on all interfaces so the ISP router's 4001 -> 4001 forward
+      # reaches the container. Same port on both sides to match the existing
+      # router rule for itenium-test.synology.me:4001.
+      - "4001:4001"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./memes:/srv/memes:ro
     healthcheck:
-      test: ["CMD", "wget", "-q", "-O-", "http://localhost/healthz"]
+      test: ["CMD", "wget", "-q", "-O-", "http://localhost:4001/healthz"]
       interval: 30s
       timeout: 3s
       retries: 3

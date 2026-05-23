@@ -49,11 +49,12 @@ To actually fire a post right now (real Slack message, file moves):
 docker compose run --rm poster python /app/post_meme.py
 ```
 
-Check that nginx is serving:
+Check that nginx is serving (locally, then through the public URL):
 
 ```sh
-curl -I http://localhost:8080/cat.jpg          # after the file has been moved
-curl    http://localhost:8080/healthz          # always returns "ok"
+curl -I http://localhost:4001/cat.jpg                       # after the file has been moved
+curl    http://localhost:4001/healthz                       # always returns "ok"
+curl -I http://itenium-test.synology.me:4001/healthz        # confirms router forward + DDNS
 ```
 
 ## Tests
